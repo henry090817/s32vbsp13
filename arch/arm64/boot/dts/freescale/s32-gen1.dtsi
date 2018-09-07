@@ -1,0 +1,586 @@
+/*
+ * Copyright 2017-2018 NXP
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ */
+
+#include <dt-bindings/clock/s32gen1-clock.h>
+
+/memreserve/ 0x8000fff8 0x00010000;
+
+/ {
+	compatible = "arm,vexpress";
+	interrupt-parent = <&gic>;
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	aliases {
+		can0 = &can0;
+		can1 = &can1;
+		can2 = &can2;
+		can3 = &can3;
+		can4 = &can4;
+		can5 = &can5;
+		can6 = &can6;
+		can7 = &can7;
+
+		serial0 = &uart0;
+		serial1 = &uart1;
+		serial2 = &uart2;
+	};
+
+
+	cpus {
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			reg = <0x0 0x0>;
+			enable-method = "spin-table";
+			cpu-release-addr = <0x0 0x8000fff8>;
+		};
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			reg = <0x0 0x1>;
+			enable-method = "spin-table";
+			cpu-release-addr = <0x0 0x8000fff8>;
+		};
+		cpu@100 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			reg = <0x0 0x100>;
+			enable-method = "spin-table";
+			cpu-release-addr = <0x0 0x8000fff8>;
+		};
+		cpu@101 {
+			device_type = "cpu";
+			compatible = "arm,armv8";
+			reg = <0x0 0x101>;
+			enable-method = "spin-table";
+			cpu-release-addr = <0x0 0x8000fff8>;
+		};
+	};
+
+	clocks {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		fxosc {
+			compatible = "fixed-clock";
+			clock-frequency = <40000000>;
+			#clock-cells = <0>;
+		};
+		firc {
+			compatible = "fixed-clock";
+			clock-frequency = <48000000>;
+			#clock-cells = <0>;
+		};
+	};
+
+	pmu {
+		compatible = "arm,armv8-pmuv3";
+		interrupts = <0 0x3c 0x4>,
+			     <0 0x3d 0x4>,
+			     <0 0x3e 0x4>,
+			     <0 0x3f 0x4>;
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <1 13 0xf08>,
+			     <1 14 0xf08>,
+			     <1 11 0xf08>,
+			     <1 10 0xf08>;
+		clock-frequency = <10000000>;
+	};
+
+	mc_cgm0: mc_cgm0@40030000 {
+		compatible = "fsl,s32gen1-mc_cgm0";
+		reg = <0x0 0x40030000 0x0 0x3000>;
+	};
+
+	mc_cgm1: mc_cgm1@40034000 {
+		compatible = "fsl,s32gen1-mc_cgm1";
+		reg = <0x0 0x40034000 0x0 0x3000>;
+	};
+
+	mc_cgm5: mc_cgm5@40068000 {
+		compatible = "fsl,s32gen1-mc_cgm5";
+		reg = <0x0 0x40068000 0x0 0x3000>;
+	};
+
+	reset_0: reset@40078000 {
+		compatible = "fsl,s32gen1-reset";
+		      /* MC RGM */
+		reg = <0x0 0x40078000 0x0 0x3000>,
+		      /* MC ME */
+		      <0x0 0x40088000 0x0 0x1000>;
+	};
+
+	siul2_0 {
+		compatible = "simple-mfd";
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+			  /* 1 EIRQs */
+		ranges = <0 0 0x0 0x4009C000 0x0 0xC4>,
+			  /* PINCTRL */
+			 <1 0 0x0 0x4009C240 0x0 0xA00>,
+			  /* Pad Data Output Register */
+			 <2 0 0x0 0x4009D300 0x0 0x68>,
+			  /* Pad Data Input Register */
+			 <3 0 0x0 0x4009D500 0x0 0x68>,
+			  /* Parallel GPIO Pad Data
+			     Out/Input Register */
+			 <4 0 0x0 0x4009D700 0x0 0x50>;
+
+		pinctrl0: siul2-pinctrl0@4009C000 {
+			compatible =
+				"fsl,s32v234-siul2-pinctrl";
+			reg = <0x1 0x0 0x0 0xA00>;
+			status = "disabled";
+		};
+
+		gpioother0: siul2-gpio0@4009D704 {
+			compatible = "fsl,s32gen1-siul2-gpio";
+			gpio-controller;
+			#gpio-cells = <2>;
+			gpio-ranges = <&pinctrl0 0 0 131>;
+				/* Output pad */
+			reg = <0x4 0x0 0x0 0x10>,
+				/* Input Pad */
+				<0x4 0x0 0x0 0x10>,
+				/* Reserved */
+				<0x2 0x0 0x0 0x68>,
+				<0x3 0x0 0x0 0x68>;
+			status = "disabled";
+		};
+	};
+
+	swt3: swt@4010C000 {
+		compatible = "fsl,s32gen1-wdt";
+		reg = <0x0 0x4010C000 0x0 0x1000>;
+		clocks = <&clks S32GEN1_CLK_FIRC>;
+		clock-names = "swt";
+		status = "disabled";
+	};
+
+	stm0: stm@4011C000{
+		compatible = "fsl,s32gen1-stm";
+		reg = <0x0 0x4011C000 0x0 0x3000>;
+		interrupts= <0 24 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "stm";
+		cpu = <2>;
+		status = "disabled";
+	};
+
+	stm1: stm@40120000{
+		compatible = "fsl,s32gen1-stm";
+		reg = <0x0 0x40120000 0x0 0x3000>;
+		interrupts= <0 25 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "stm";
+		cpu = <3>;
+		status = "disabled";
+	};
+
+	edma0: dma-controller@40144000 {
+		#dma-cells = <2>;
+		compatible = "fsl,s32gen1-edma";
+		reg = <0x0 0x40144000 0x0 0x24000>,
+		      <0x0 0x4012C000 0x0 0x3000>,
+		      <0x0 0x40130000 0x0 0x3000>;
+		dma-channels = <32>;
+		interrupts = <0 8 4>,
+			     <0 9 4>,
+			     <0 10 4>;
+		interrupt-names = "edma-tx_0-15",
+				  "edma-tx_16-31",
+				  "edma-err";
+		clock-names = "dmamux0", "dmamux1";
+		clocks = <&clks S32GEN1_CLK_XBAR>,
+			 <&clks S32GEN1_CLK_XBAR>;
+		status = "disabled";
+	};
+
+	pit0: pit@40188000{
+		compatible = "fsl,s32gen1-pit";
+		reg = <0x0 0x40188000 0x0 0x3000>;
+		interrupts= <0 53 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "pit";
+		cpu = <0>;
+		status = "disabled";
+	};
+
+	mscm0: mscm@40198000  {
+		compatible = "fsl,s32gen1-mscm";
+
+		reg = <0x0 0x40198000 0x0 0x1000>;
+
+		/* CPU2CPU interrupts */
+		interrupts = <0 1 4>, // CPU to M7/A53/R52 interrupt#0 (GIC 33)
+			     <0 2 4>, // CPU to M7/A53/R52 interrupt#1 (GIC 34)
+			     <0 3 4>; // CPU to M7/A53/R52 interrupt#2 (GIC 35)
+	};
+
+	can0: flexcan@401B4000{
+		compatible = "fsl,s32gen1-flexcan";
+		reg = <0x0 0x401B4000 0x0 0xA000>;
+		interrupts = <0 40 4>;
+		clocks = <&clks S32GEN1_CLK_CAN>,
+			 <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg", "per";
+		status = "disabled";
+	};
+
+	can1: flexcan@401BE000{
+		compatible = "fsl,s32gen1-flexcan";
+		reg = <0x0 0x401BE000 0x0 0xA000>;
+		interrupts = <0 44 4>;
+		clocks = <&clks S32GEN1_CLK_CAN>,
+			 <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg", "per";
+		status = "disabled";
+	};
+
+	uart0:serial@401C8000 {
+		compatible = "fsl,s32-linflexuart";
+		reg = <0x0 0x401C8000 0x0 0x3000>;
+		interrupts = <0 82 1>;
+		clocks = <&clks S32GEN1_CLK_LIN_BAUD>,
+			 <&clks S32GEN1_CLK_LIN>;
+		clock-names = "lin", "ipg";
+		dmas = <&edma0 0 3>,
+		       <&edma0 0 2>;
+		dma-names = "rx", "tx";
+	};
+
+	uart1:serial@401CC000 {
+		compatible = "fsl,s32-linflexuart";
+		reg = <0x0 0x401CC000 0x0 0x3000>;
+		interrupts = <0 83 1>;
+		clocks = <&clks S32GEN1_CLK_LIN_BAUD>,
+			 <&clks S32GEN1_CLK_LIN>;
+		clock-names = "lin", "ipg";
+		dmas = <&edma0 0 5>,
+		       <&edma0 0 4>;
+		dma-names = "rx", "tx";
+	};
+
+	spi0: spi@401D4000 {
+		compatible = "fsl,s32gen1-dspi";
+		reg = <0x0 0x401D4000 0x0 0x3000>;
+		interrupts = <0 85 4>;
+		clocks = <&clks S32GEN1_CLK_DSPI>;
+		clock-names = "dspi";
+		spi-num-chipselects = <5>;
+		bus-num = <0>;
+		spi-cpol;
+		spi-cpha;
+		status = "disabled";
+	};
+
+	spi1: spi@401D8000 {
+		compatible = "fsl,s32gen1-dspi";
+		reg = <0x0 0x401D8000 0x0 0x3000>;
+		interrupts = <0 86 4>;
+		clocks = <&clks S32GEN1_CLK_DSPI>;
+		clock-names = "dspi";
+		spi-num-chipselects = <5>;
+		bus-num = <1>;
+		spi-cpol;
+		spi-cpha;
+		status = "disabled";
+	};
+
+	spi2: spi@401DC000 {
+		compatible = "fsl,s32gen1-dspi";
+		reg = <0x0 0x401DC000 0x0 0x3000>;
+		interrupts = <0 87 4>;
+		clocks = <&clks S32GEN1_CLK_DSPI>;
+		clock-names = "dspi";
+		spi-num-chipselects = <5>;
+		bus-num = <2>;
+		spi-cpol;
+		spi-cpha;
+		status = "disabled";
+	};
+
+	i2c0: i2c@401E4000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "fsl,s32gen1-i2c";
+		reg = <0x0 0x401E4000 0x0 0x1000>;
+		interrupts =<0 92 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg";
+		dmas = <&edma0 0 15>,
+		       <&edma0 0 16>;
+		dma-names = "rx","tx";
+		status = "disabled";
+	};
+
+	i2c1: i2c@401E8000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "fsl,s32gen1-i2c";
+		reg = <0x0 0x401E8000 0x0 0x1000>;
+		interrupts =<0 93 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg";
+		dmas = <&edma0 0 17>,
+		       <&edma0 0 18>;
+		dma-names = "rx","tx";
+		status = "disabled";
+	};
+
+	i2c2: i2c@401EC000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "fsl,s32gen1-i2c";
+		reg = <0x0 0x401EC000 0x0 0x1000>;
+		interrupts =<0 94 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg";
+		dmas = <&edma1 1 15>,
+		       <&edma1 1 16>;
+		dma-names = "rx","tx";
+		status = "disabled";
+	};
+
+	swt4: swt@40200000 {
+		compatible = "fsl,s32gen1-wdt";
+		reg = <0x0 0x40200000 0x0 0x1000>;
+		clocks = <&clks S32GEN1_CLK_FIRC>;
+		clock-names = "swt";
+		status = "disabled";
+	};
+
+	swt5: swt@40204000 {
+		compatible = "fsl,s32gen1-wdt";
+		reg = <0x0 0x40204000 0x0 0x1000>;
+		clocks = <&clks S32GEN1_CLK_FIRC>;
+		clock-names = "swt";
+		status = "disabled";
+	};
+
+	swt6: swt@40208000 {
+		compatible = "fsl,s32gen1-wdt";
+		reg = <0x0 0x40208000 0x0 0x1000>;
+		clocks = <&clks S32GEN1_CLK_FIRC>;
+		clock-names = "swt";
+		status = "disabled";
+	};
+
+	edma1: dma-controller@40244000 {
+		#dma-cells = <2>;
+		compatible = "fsl,s32gen1-edma";
+		reg = <0x0 0x40244000 0x0 0x24000>,
+		      <0x0 0x4022C000 0x0 0x3000>,
+		      <0x0 0x40230000 0x0 0x3000>;
+		dma-channels = <32>;
+		interrupts = <0 11 4>,
+			     <0 12 4>,
+			     <0 13 4>;
+		interrupt-names = "edma-tx_0-15",
+				  "edma-tx_16-31",
+				  "edma-err";
+		clock-names = "dmamux0", "dmamux1";
+		clocks = <&clks S32GEN1_CLK_XBAR>,
+			 <&clks S32GEN1_CLK_XBAR>;
+		status = "disabled";
+	};
+
+	pit1: pit@40288000{
+		compatible = "fsl,s32gen1-pit";
+		reg = <0x0 0x40288000 0x0 0x3000>;
+		interrupts= <0 54 4>;
+		cpu = <1>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "pit";
+		status = "disabled";
+	};
+
+	can2: flexcan@402A8000{
+		compatible = "fsl,s32gen1-flexcan";
+		reg = <0x0 0x402A8000 0x0 0xA000>;
+		interrupts = <0 48 4>;
+		clocks = <&clks S32GEN1_CLK_CAN>,
+			 <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg", "per";
+		status = "disabled";
+	};
+
+	can3: flexcan@402B2000{
+		compatible = "fsl,s32gen1-flexcan";
+		reg = <0x0 0x402B2000 0x0 0xA000>;
+		interrupts = <0 52 4>;
+		clocks = <&clks S32GEN1_CLK_CAN>,
+			 <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg", "per";
+		status = "disabled";
+	};
+
+	uart2:serial@402BC000 {
+		compatible = "fsl,s32-linflexuart";
+		reg = <0x0 0x402BC000 0x0 0x3000>;
+		interrupts = <0 84 1>;
+		clocks = <&clks S32GEN1_CLK_LIN_BAUD>,
+			 <&clks S32GEN1_CLK_LIN>;
+		clock-names = "lin", "ipg";
+		dmas = <&edma1 1 3>,
+		       <&edma1 1 2>;
+		dma-names = "rx", "tx";
+	};
+
+	spi3: spi@402C8000 {
+		compatible = "fsl,s32gen1-dspi";
+		reg = <0x0 0x402C8000 0x0 0x3000>;
+		interrupts = <0 88 4>;
+		clocks = <&clks S32GEN1_CLK_DSPI>;
+		clock-names = "dspi";
+		spi-num-chipselects = <5>;
+		bus-num = <3>;
+		spi-cpol;
+		spi-cpha;
+		status = "disabled";
+	};
+
+	spi4: spi@402CC000 {
+		compatible = "fsl,s32gen1-dspi";
+		reg = <0x0 0x402CC000 0x0 0x3000>;
+		interrupts = <0 89 4>;
+		clocks = <&clks S32GEN1_CLK_DSPI>;
+		clock-names = "dspi";
+		spi-num-chipselects = <5>;
+		bus-num = <4>;
+		spi-cpol;
+		spi-cpha;
+		status = "disabled";
+	};
+
+	spi5: spi@402D0000 {
+		compatible = "fsl,s32gen1-dspi";
+		reg = <0x0 0x402D0000 0x0 0x3000>;
+		interrupts = <0 90 4>;
+		clocks = <&clks S32GEN1_CLK_DSPI>;
+		clock-names = "dspi";
+		spi-num-chipselects = <5>;
+		bus-num = <5>;
+		spi-cpol;
+		spi-cpha;
+		status = "disabled";
+	};
+
+	i2c3: i2c@402D8000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "fsl,s32gen1-i2c";
+		reg = <0x0 0x402D8000 0x0 0x1000>;
+		interrupts =<0 95 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg";
+		dmas = <&edma1 1 17>,
+		       <&edma1 1 18>;
+		dma-names = "rx","tx";
+		status = "disabled";
+	};
+
+	i2c4: i2c@402DC000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "fsl,s32gen1-i2c";
+		reg = <0x0 0x402DC000 0x0 0x1000>;
+		interrupts =<0 96 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg";
+		dmas = <&edma1 1 19>,
+		       <&edma1 1 20>;
+		dma-names = "rx","tx";
+		status = "disabled";
+	};
+
+	usdhc0: usdhc@402F0000{
+		compatible = "fsl,s32gen1-usdhc";
+		reg = <0x0 0x4002F000 0x0 0x1000>;
+		interrupts = <0 36 4>;
+		clocks = <&clks S32GEN1_CLK_XBAR_DIV3>,
+			 <&clks S32GEN1_CLK_XBAR>,
+			 <&clks S32GEN1_CLK_SDHC>;
+		clock-names = "ipg", "ahb", "per";
+		bus-width = <8>;
+		status = "disabled";
+	};
+
+	can4: flexcan@44000000{
+		compatible = "fsl,s32gen1-flexcan";
+		reg = <0x0 0x44000000 0x0 0xA000>;
+		interrupts = <0 194 4>;
+		clocks = <&clks S32GEN1_CLK_CAN>,
+			 <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg", "per";
+		status = "disabled";
+	};
+
+	can5: flexcan@44004000{
+		compatible = "fsl,s32gen1-flexcan";
+		reg = <0x0 0x44004000 0x0 0xA000>;
+		interrupts = <0 198 4>;
+		clocks = <&clks S32GEN1_CLK_CAN>,
+			 <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg", "per";
+		status = "disabled";
+	};
+
+	can6: flexcan@44008000{
+		compatible = "fsl,s32gen1-flexcan";
+		reg = <0x0 0x44008000 0x0 0xA000>;
+		interrupts = <0 202 4>;
+		clocks = <&clks S32GEN1_CLK_CAN>,
+			 <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg", "per";
+		status = "disabled";
+	};
+
+	can7: flexcan@4400C000{
+		compatible = "fsl,s32gen1-flexcan";
+		reg = <0x0 0x4400C000 0x0 0xA000>;
+		interrupts = <0 206 4>;
+		clocks = <&clks S32GEN1_CLK_CAN>,
+			 <&clks S32GEN1_CLK_XBAR_DIV3>;
+		clock-names = "ipg", "per";
+		status = "disabled";
+	};
+
+	gic: interrupt-controller@50800000 {
+		compatible = "arm,gic-v3";
+		#interrupt-cells = <3>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+		interrupt-controller;
+		reg = <0 0x50800000 0 0x10000>,
+		      <0 0x50880000 0 0x200000>,
+		      <0 0x50400000 0 0x2000>,
+		      <0 0x50410000 0 0x2000>,
+		      <0 0x50420000 0 0x2000>;
+		interrupts = <1 9 0xf04>;
+	};
+
+	memory_DDR0@80000000 {
+		device_type = "memory";
+		reg = <0 0x80000000 0 0x40000000>;
+	};
+
+	memory_DDR1@c0000000 {
+		device_type = "memory";
+		reg = <0 0xc0000000 0 0x40000000>;
+	};
+};
