@@ -65,8 +65,8 @@
 				vfront-porch = <4>;
 				hback-porch = <148>;
 				hfront-porch = <88>;
-				hsync-len = <45>;
-				vsync-len = <16>;
+				hsync-len = <44>;
+				vsync-len = <5>;
 			};
 
 			timing1: hdmi-wuxga {
