@@ -101,7 +101,7 @@
 
 		/* Memory used exclusively for DCU & FB display surfaces */
 		dcu_surface_memory: dcu@0xC0000000 {
-			reg = <0x0 0xC0000000 0x0 0x02000000>;	/* 16 MB */
+			reg = <0x0 0xC0000000 0x0 0x01000000>;	/* 16 MB */
 			no-map;
 		};
 
@@ -111,38 +111,37 @@
 			reg = <0x0 0xFD000000 0x0 0x400000>;    /* 4 MB */
 			no-map;
 		};
-		
-		themem: rmem@C4F00000 {
-			reg = <0x0 0xc4f00000 0x0 0x100000>;
+		resmem: rmem@C4F00000 {
+			reg = <0 0xC4F00000 0 0x100000>;
 			no-map;
 		};
 
-		oalmem_0: oalddr0@0x8B000000 {
-			reg = <0x0 0x8b000000 0x0 0x5000000>;
+		oalddr0_allocator_memory: oalddr0@0x8B000000 {
+			reg = <0x0 0x8B000000 0x0 0x04D00000>;  /* 77 MB */
 			no-map;
 		};
 
-		oalddr_1: oalddr1@0xCB000000 {
-			reg = <0x0 0xcb000000 0x0 0x5000000>;
+		oalddr1_allocator_memory: oalddr1@0xCB000000 {
+			reg = <0x0 0xCB000000 0x0 0x05000000>;  /* 80 MB */
 			no-map;
 		};
 
-		oalsramS: oalsramS@0x3E800000 {
-			reg = <0x0 0x3e800000 0x0 0x300000>;
+		oalsramS_allocator_memory: oalsramS@0x3E800000 {
+			reg = <0x0 0x3E800000 0x0 0x00300000>;  /* 3 MB */
 			no-map;
 		};
 
-		oalsramM: oalsramM@0x3EB00000 {
-			reg = <0x0 0x3eb00000 0x0 0x100000>;
+		oalsramM_allocator_memory: oalsramM@0x3EB00000 {
+			reg = <0x0 0x3EB00000 0x0 0x00100000>;  /* 1 MB */
 			no-map;
 		};
 	};
 
-	themem@C4F00000 {
+	nxpresmem: themem@C4F00000 {
 		status = "okay";
 		compatible = "nxp,resmem";
-		memory-region = <&themem>;
-		interrupts = <0x0 0x0 0x4>;		
+		memory-region = <&resmem>;
+		interrupts = <0 0 4>;
 	};
 
 	timer {
@@ -515,55 +514,58 @@
 				vref = <1800>;
 				status = "okay";
 			};
-
-			oalmem0@8B000000 {
-				compatible = "fsl,s32v234-oal";
-				reg = <0x0 0x8b000000 0x0 0x5000000>;
-				memory-region = <&oalmem_0>;
-				id = <0x0>;
-				align = <0x1000>;
-				autobalance;
+			oalmem0: oalmem0@8B000000 {
+				compatible = "fsl,s32v234-oal";               // OAL ALLOCATOR DEVICE
+				reg = <0x0 0x8B000000 0x0 0x04D00000>;        // MEMORY RANGE
+				memory-region = <&oalddr0_allocator_memory>;  // MEMORY REGION TO USE (RESERVED MEMORY)
+				id = <0>;                                     // ID (FOR ALLOCATORY USE - MUST MATCH WITH MEM REGION ID)
+				align = <0x1000>;                             // DEFAULT ALIGNMENT
+				autobalance;                                  // PRESENT IF AUTOBALANCE IS NEEDED (ONE AUTO BALANCE REGION)
 			};
 
-			oalmem1@CB000000 {
-				compatible = "fsl,s32v234-oal";
-				reg = <0x0 0xcb000000 0x0 0x5000000>;
-				memory-region = <&oalddr_1>;
-				id = <0x1>;
-				align = <0x1000>;
-				autobalance;
+			oalmem1: oalmem1@CB000000 {
+				compatible = "fsl,s32v234-oal";               // OAL ALLOCATOR DEVICE
+				reg = <0x0 0xCB000000 0x0 0x05000000>;        // MEMORY RANGE
+				memory-region = <&oalddr1_allocator_memory>;  // MEMORY REGION TO USE (RESERVED MEMORY)
+				id = <1>;                                     // ID (FOR ALLOCATORY USE - MUST MATCH WITH MEM REGION ID)
+				align = <0x1000>;                             // DEFAULT ALIGNMENT
+				autobalance;                                  // PRESENT IF AUTOBALANCE IS NEEDED (ONE AUTO BALANCE REGION)
 			};
 
-			oalsramS@3E800000 {
+			oalsramS: oalsramS@3E800000 {
 				compatible = "fsl,s32v234-oal";
-				reg = <0x0 0x3e800000 0x0 0x300000>;
-				memory-region = <&oalsramS>;
-				id = <0x2>;
+				reg = <0x0 0x3E800000 0x0 0x00300000>;
+				memory-region = <&oalsramS_allocator_memory>;
+				id = <2>;
 				align = <0x8>;
 				init;
 			};
 
-			oalsramM@3EB00000 {
+			oalsramM: oalsramM@3EB00000 {
 				compatible = "fsl,s32v234-oal";
-				reg = <0x0 0x3eb00000 0x0 0x100000>;
-				memory-region = <&oalsramM>;
-				id = <0x3>;
+				reg = <0x0 0x3EB00000 0x0 0x00100000>;
+				memory-region = <&oalsramM_allocator_memory>;
+				id = <3>;
 				align = <0x8>;
 				init;
 			};
 
-			apex0@0x74000000 {
+			// 1 = low-to-high edge triggered
+			// 2 = high-to-low edge triggered
+			// 4 = active high level-sensitive
+			// 8 = active low level-sensiti
+			apex0: apex0@0x74000000 {
 				compatible = "nxp,s32v234-apex";
-				reg = <0x0 0x74000000 0x0 0x100000>;
-				id = <0x0>;
-				interrupts = <0x0 0x6d 0x4>;
+				reg = <0x0 0x74000000 0x0 0x00100000>;
+				id = <0>;
+				interrupts = <0 109 4>;
 			};
 
-			apex1@0x78000000 {
+			apex1: apex1@0x78000000 {
 				compatible = "nxp,s32v234-apex";
-				reg = <0x0 0x78000000 0x0 0x100000>;
-				id = <0x1>;
-				interrupts = <0x0 0x6e 0x4>;
+				reg = <0x0 0x78000000 0x0 0x00100000>;
+				id = <1>;
+				interrupts = <0 110 4>;
 			};
 		};
 

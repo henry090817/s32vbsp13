@@ -2,7 +2,7 @@
 menuconfig RC_CORE
 	tristate "Remote Controller support"
 	depends on INPUT
-	default y
+	default n
 	---help---
 	  Enable support for Remote Controllers on Linux. This is
 	  needed in order to support several video capture adapters,
@@ -49,7 +49,7 @@ config IR_NEC_DECODER
 	tristate "Enable IR raw decoder for the NEC protocol"
 	depends on RC_CORE
 	select BITREVERSE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have IR with NEC protocol, and
@@ -59,7 +59,7 @@ config IR_RC5_DECODER
 	tristate "Enable IR raw decoder for the RC-5 protocol"
 	depends on RC_CORE
 	select BITREVERSE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have IR with RC-5 protocol, and
@@ -69,7 +69,7 @@ config IR_RC6_DECODER
 	tristate "Enable IR raw decoder for the RC6 protocol"
 	depends on RC_CORE
 	select BITREVERSE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have an infrared remote control which
@@ -79,7 +79,7 @@ config IR_JVC_DECODER
 	tristate "Enable IR raw decoder for the JVC protocol"
 	depends on RC_CORE
 	select BITREVERSE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have an infrared remote control which
@@ -89,7 +89,7 @@ config IR_SONY_DECODER
 	tristate "Enable IR raw decoder for the Sony protocol"
 	depends on RC_CORE
 	select BITREVERSE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have an infrared remote control which
@@ -98,7 +98,7 @@ config IR_SONY_DECODER
 config IR_SANYO_DECODER
 	tristate "Enable IR raw decoder for the Sanyo protocol"
 	depends on RC_CORE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have an infrared remote control which
@@ -108,7 +108,7 @@ config IR_SANYO_DECODER
 config IR_SHARP_DECODER
 	tristate "Enable IR raw decoder for the Sharp protocol"
 	depends on RC_CORE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have an infrared remote control which
@@ -119,7 +119,7 @@ config IR_MCE_KBD_DECODER
 	tristate "Enable IR raw decoder for the MCE keyboard/mouse protocol"
 	depends on RC_CORE
 	select BITREVERSE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have a Microsoft Remote Keyboard for
@@ -130,7 +130,7 @@ config IR_XMP_DECODER
 	tristate "Enable IR raw decoder for the XMP protocol"
 	depends on RC_CORE
 	select BITREVERSE
-	default y
+	default n
 
 	---help---
 	   Enable this option if you have IR with XMP protocol, and

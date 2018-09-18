@@ -383,7 +383,7 @@ static int sii902x_probe(struct i2c_client *client,
 	sii902x_poweron();
 
 	// detect resolution
-	sii902x_get_edid(&global_fbi);
+	//sii902x_get_edid(&global_fbi);
 
 	return 0;
 }
