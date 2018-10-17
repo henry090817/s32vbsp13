@@ -343,7 +343,7 @@
 				interrupts =<0 67 4>;
 				clocks = <&clks S32V234_CLK_IIC0>;
 				clock-names = "ipg";
-				clock-frequency = <400000>;
+				clock-frequency = <100000>;
 				dmas = <&edma 0 5>,
 				       <&edma 0 6>;
 				dma-names = "rx","tx";

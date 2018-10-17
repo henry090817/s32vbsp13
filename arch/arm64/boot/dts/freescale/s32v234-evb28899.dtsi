@@ -190,6 +190,11 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c0>;
 	status = "okay";
+
+	rtc: ds1307@68 {
+		compatible = "dallas,ds1307";
+		reg = <0x68>;
+	};
 };
 
 &i2c1 {
