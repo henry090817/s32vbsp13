@@ -596,7 +596,7 @@ gpio_keys_get_devtree_pdata(struct device *dev)
 	int error;
 	int nbuttons;
 	int i;
-	char *input_name = NULL;
+	const char *input_name = NULL;
 	int ret = -1;
 
 	node = dev->of_node;
